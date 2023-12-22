@@ -11,7 +11,6 @@ export const GET = async ({ url, cookies, locals }) => {
 			status: 400
 		});
 	}
-	console.log('HERE');
 	try {
 		const { getExistingUser, githubUser, createUser } = await githubAuth.validateCallback(code);
 
@@ -20,7 +19,8 @@ export const GET = async ({ url, cookies, locals }) => {
 			if (existingUser) return existingUser;
 			const user = await createUser({
 				attributes: {
-					username: githubUser.login
+					username: githubUser.login,
+					avatar: null
 				}
 			});
 			return user;
