@@ -70,12 +70,12 @@
 
 @layer base {
 	* {
-		@apply border-border;
+		@apply border-border box-border;
 	}
   html {
-    @apply antialiased;
+    @apply antialiased p-0 m-0;
   }
 	body {
-		@apply bg-background text-foreground transition-colors duration-300;
+		@apply bg-background text-foreground transition-colors duration-300 h-[100svh] p-0 m-0 flex items-center justify-between gap-2;
 	}
 }

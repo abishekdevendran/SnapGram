@@ -1,6 +1,6 @@
 // schema.ts
 import { relations } from 'drizzle-orm';
-import { mysqlTable, bigint, varchar } from 'drizzle-orm/mysql-core';
+import { mysqlTable, bigint, varchar, boolean, primaryKey } from 'drizzle-orm/mysql-core';
 
 export const user = mysqlTable('user', {
 	id: varchar('id', {
@@ -12,7 +12,8 @@ export const user = mysqlTable('user', {
 	}).unique(),
 	avatar: varchar('avatar', {
 		length: 255
-	})
+	}),
+	isPrivate: boolean('isPrivate').default(false)
 });
 
 export const post = mysqlTable('post', {
@@ -21,7 +22,10 @@ export const post = mysqlTable('post', {
 	}).primaryKey(),
 	image: varchar('image', {
 		length: 255
-	}).notNull()
+	}).notNull(),
+	likes: bigint('likes', {
+		mode: 'number'
+	}).default(0)
 });
 
 export const comment = mysqlTable('comment', {
@@ -44,39 +48,90 @@ export const comment = mysqlTable('comment', {
 });
 
 // junction tables
-export const userToPost = mysqlTable('users_to_posts', {
-	userId: varchar('user_id', {
-		length: 15
+export const userToPost = mysqlTable(
+	'users_to_posts',
+	{
+		userId: varchar('user_id', {
+			length: 15
+		})
+			.notNull()
+			.references(() => user.id),
+		postId: varchar('post_id', {
+			length: 15
+		})
+			.notNull()
+			.references(() => post.id)
+	},
+	(t) => ({
+		pk: primaryKey({
+			columns: [t.userId, t.postId]
+		})
 	})
-		.notNull()
-		.references(() => user.id),
-	postId: varchar('post_id', {
-		length: 15
+);
+export const userToUser = mysqlTable(
+	'users_to_users',
+	{
+		user1Id: varchar('user1_id', {
+			length: 15
+		})
+			.notNull()
+			.references(() => user.id),
+		user2Id: varchar('user2_id', {
+			length: 15
+		})
+			.notNull()
+			.references(() => user.id)
+	},
+	(t) => ({
+		pk: primaryKey({
+			columns: [t.user1Id, t.user2Id]
+		})
 	})
-		.notNull()
-		.references(() => post.id)
-});
+);
 
 // relations
 export const userRelations = relations(user, ({ many }) => ({
 	userToPost: many(userToPost),
-	comment: many(comment)
+	comment: many(comment),
+	followers: many(userToUser, { relationName: 'followers' }),
+	following: many(userToUser, { relationName: 'following' })
 }));
 export const postRelations = relations(post, ({ many }) => ({
 	userToPost: many(userToPost),
 	comment: many(comment)
+}));
+export const commentRelations = relations(comment, ({ one }) => ({
+	user: one(user, {
+		fields: [comment.userId],
+		references: [user.id]
+	}),
+	post: one(post, {
+		fields: [comment.postId],
+		references: [post.id]
+	})
 }));
 export const userToPostRelations = relations(userToPost, ({ one }) => ({
 	user: one(user, {
 		fields: [userToPost.userId],
 		references: [user.id]
 	}),
-	post: one(post,{
+	post: one(post, {
 		fields: [userToPost.postId],
 		references: [post.id]
 	})
 }));
+export const userToUserRelations = relations(userToUser, ({ one }) => ({
+	following: one(user, {
+		fields: [userToUser.user1Id],
+		references: [user.id]
+	}),
+	follower: one(user, {
+		fields: [userToUser.user2Id],
+		references: [user.id]
+	})
+}));
 
+// Ideally never need to touch any of the below tables
 export const key = mysqlTable('key', {
 	id: varchar('id', {
 		length: 255
