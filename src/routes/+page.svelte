@@ -11,7 +11,7 @@
 <main>
 	{#if data.user}
 		Welcome {data.user.username}!
-		<Avatar user={data.user} />
+		<Avatar bind:user={data.user} />
 		<form
 			action="?/logout"
 			method="POST"

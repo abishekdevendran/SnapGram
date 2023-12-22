@@ -6,10 +6,13 @@ export const GET = async ({ locals, url }) => {
 	console.log('GET /api/uploadImage');
 	const timestamp = url.searchParams.get('timestamp');
 	const folder = url.searchParams.get('folder');
-	const custom_coordinates = url.searchParams.get('custom_coordinates');
+	let custom_coordinates: string | null | undefined = url.searchParams.get('custom_coordinates');
 	const upload_preset = url.searchParams.get('upload_preset');
 	if (!timestamp || !folder || !custom_coordinates || !upload_preset)
 		return new Response(null, { status: 400 });
+	if (custom_coordinates === 'undefined') {
+		custom_coordinates = undefined;
+	}
 
 	const session = await locals.auth.validate();
 	if (!session) return new Response(null, { status: 401 });

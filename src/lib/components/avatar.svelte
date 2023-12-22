@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { PUBLIC_CLOUDINARY_API_KEY } from '$env/static/public';
-	import Button from '$lib/components/ui/button/button.svelte';
 	import { onMount } from 'svelte';
 	import toast from 'svelte-french-toast';
 	import * as Avatar from '$lib/components/ui/avatar';
@@ -104,10 +103,16 @@
 							if (!res.ok) {
 								throw new Error('Something went wrong');
 							}
+							const resp = await res.json();
+							if (resp.type === 'failure') {
+								throw new Error("Couldn't update avatar");
+							}
+							console.log(resp);
 							// replace current avatar with new one
 							user && (user.avatar = result.info.secure_url);
 							toast.success('Avatar updated successfully');
 						} catch (e) {
+							console.error(e);
 							toast.error('Something went wrong');
 						}
 					}
