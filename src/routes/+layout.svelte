@@ -6,7 +6,7 @@
 </script>
 
 <Toaster />
-<nav class="flex h-full w-16 items-center justify-center">
+<nav class="flex h-[100svh] w-16 items-center justify-center sticky top-0">
 	<Lightswitch />
 </nav>
 <slot />
