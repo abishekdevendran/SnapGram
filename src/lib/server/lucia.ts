@@ -19,7 +19,8 @@ export const auth = lucia({
 	getUserAttributes: (data) => {
 		return {
 			username: data.username,
-			avatar: data.avatar
+			avatar: data.avatar,
+			isPrivate: data.isPrivate
 		};
 	}
 });

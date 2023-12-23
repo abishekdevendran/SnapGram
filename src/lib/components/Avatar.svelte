@@ -5,8 +5,10 @@
 	import * as Avatar from '$lib/components/ui/avatar';
 	import { Pencil2 } from 'radix-icons-svelte';
 	import type { User } from 'lucia';
-	let { user } = $props<{
+	import { cn } from '$lib/utils/ui';
+	let { user, className } = $props<{
 		user: User;
+		className: string | undefined;
 	}>();
 	let widget = $state<any>(null);
 	interface Coordinates {
@@ -96,7 +98,7 @@
 						formData.append('avatar', result.info.secure_url);
 						// send formData to server
 						try {
-							const res = await fetch('?/updateAvatar', {
+							const res = await fetch('/?/updateAvatar', {
 								method: 'POST',
 								body: formData
 							});
@@ -122,8 +124,14 @@
 	});
 </script>
 
-<Avatar.Root class="group/avatar relative h-16 w-16 cursor-pointer" onclick={() => widget?.open()}>
-	<Avatar.Image src={user.avatar} alt="@shadcn" />
+<svelte:head>
+	<script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+</svelte:head>
+<Avatar.Root
+	class={cn('group/avatar relative h-16 w-16 cursor-pointer', className)}
+	onclick={() => widget?.open()}
+>
+	<Avatar.Image src={user.avatar} alt={user.username} />
 	<Avatar.Fallback>CN</Avatar.Fallback>
 	<div
 		class="absolute bottom-0 flex h-6 w-full items-center justify-center bg-slate-600 opacity-0 group-hover/avatar:opacity-75"

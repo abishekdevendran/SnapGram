@@ -8,6 +8,20 @@
       "when": 1703251147436,
       "tag": "0000_elite_glorian",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1703338011894,
+      "tag": "0001_wooden_lethal_legion",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1703345187110,
+      "tag": "0002_broken_gressill",
+      "breakpoints": true
     }
   ]
 }

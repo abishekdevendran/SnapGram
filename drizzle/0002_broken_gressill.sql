@@ -1,0 +1,1 @@
+ALTER TABLE `post` ADD `created_at` timestamp DEFAULT CURRENT_TIMESTAMP;

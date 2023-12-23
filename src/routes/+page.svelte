@@ -1,13 +1,16 @@
 <script lang="ts">
+	import FeedPost from '$lib/components/FeedPost.svelte';
 	import Profile from '$lib/components/Profile.svelte';
-	import Lightswitch from '$lib/components/nav/lightswitch.svelte';
 	let { data } = $props();
 </script>
 
-<nav class="flex h-full w-1/3 items-center justify-center">
-	<Lightswitch />
-</nav>
-<main class="min-w-96">
-	
+<main class="min-w-96 flex flex-col gap-4 pt-6">
+	{#if !data.feed || !data.feed.length}
+		<p class="text-center">No posts yet.</p>
+	{:else}
+		{#each data.feed as feedPost}
+			<FeedPost bind:data={feedPost} />
+		{/each}
+	{/if}
 </main>
 <Profile bind:user={data.user} />

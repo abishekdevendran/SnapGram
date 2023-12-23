@@ -1,6 +1,13 @@
 // schema.ts
-import { relations } from 'drizzle-orm';
-import { mysqlTable, bigint, varchar, boolean, primaryKey } from 'drizzle-orm/mysql-core';
+import { relations, sql } from 'drizzle-orm';
+import {
+	mysqlTable,
+	bigint,
+	varchar,
+	boolean,
+	primaryKey,
+	timestamp
+} from 'drizzle-orm/mysql-core';
 
 export const user = mysqlTable('user', {
 	id: varchar('id', {
@@ -25,7 +32,8 @@ export const post = mysqlTable('post', {
 	}).notNull(),
 	likes: bigint('likes', {
 		mode: 'number'
-	}).default(0)
+	}).default(0),
+	createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`)
 });
 
 export const comment = mysqlTable('comment', {
@@ -88,13 +96,34 @@ export const userToUser = mysqlTable(
 		})
 	})
 );
+export const followRequest = mysqlTable(
+	'follow_request',
+	{
+		followerId: varchar('follower_id', {
+			length: 15
+		})
+			.notNull()
+			.references(() => user.id),
+		followingId: varchar('following_id', {
+			length: 15
+		})
+			.notNull()
+			.references(() => user.id)
+	},
+	(t) => ({
+		pk: primaryKey({
+			columns: [t.followerId, t.followingId]
+		})
+	})
+);
 
 // relations
 export const userRelations = relations(user, ({ many }) => ({
 	userToPost: many(userToPost),
 	comment: many(comment),
-	followers: many(userToUser, { relationName: 'followers' }),
-	following: many(userToUser, { relationName: 'following' })
+	followers: many(userToUser, { relationName: 'follower' }),
+	following: many(userToUser, { relationName: 'following' }),
+	followRequests: many(followRequest, { relationName: 'followRequests' })
 }));
 export const postRelations = relations(post, ({ many }) => ({
 	userToPost: many(userToPost),
@@ -122,14 +151,26 @@ export const userToPostRelations = relations(userToPost, ({ one }) => ({
 }));
 export const userToUserRelations = relations(userToUser, ({ one }) => ({
 	following: one(user, {
-		fields: [userToUser.user1Id],
+		fields: [userToUser.user2Id],
 		references: [user.id],
 		relationName: 'following'
 	}),
 	follower: one(user, {
-		fields: [userToUser.user2Id],
+		fields: [userToUser.user1Id],
 		references: [user.id],
-		relationName: 'followers'
+		relationName: 'follower'
+	})
+}));
+export const followRequestRelations = relations(followRequest, ({ one }) => ({
+	follower: one(user, {
+		fields: [followRequest.followerId],
+		references: [user.id],
+		relationName: 'follower'
+	}),
+	following: one(user, {
+		fields: [followRequest.followingId],
+		references: [user.id],
+		relationName: 'following'
 	})
 }));
 

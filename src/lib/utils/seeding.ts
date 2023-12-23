@@ -38,7 +38,7 @@ const seedPosts = async () => {
 	// get all users
 	const users = await db.select().from(schema.user);
 	// create posts
-	const posts: Post[] = users.map((user) => {
+	const posts: Omit<Post, 'createdAt'>[] = users.map((user) => {
 		return {
 			id: faker.string.alphanumeric(15),
 			image: faker.image.url(),

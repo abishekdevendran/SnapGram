@@ -12,7 +12,7 @@
 
 <div class="flex h-full w-1/3 items-center justify-center gap-2">
 	{#if user}
-		<Avatar bind:user />
+		<Avatar bind:user className="h-20 w-20" />
 		<Button href={`/${user.username}`}>
 			{user.username}
 		</Button>

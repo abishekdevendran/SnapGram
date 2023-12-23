@@ -21,6 +21,7 @@ declare global {
 		type DatabaseUserAttributes = {
 			username: string;
 			avatar: string | null;
+			isPrivate: boolean;
 		};
 		type DatabaseSessionAttributes = {};
 	}
