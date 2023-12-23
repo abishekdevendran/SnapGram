@@ -17,10 +17,15 @@ export const GET = async ({ url, cookies, locals }) => {
 		const getUser = async () => {
 			const existingUser = await getExistingUser();
 			if (existingUser) return existingUser;
+			// ensure username is unique
+			const ext=await locals.db.query.user.findMany({
+				where: (t, { eq }) => eq(t.username, githubUser.login)
+			});
 			const user = await createUser({
 				attributes: {
-					username: githubUser.login,
-					avatar: null
+					username: ext.length ? `${githubUser.login}-${ext.length}` : githubUser.login,
+					avatar: null,
+					isPrivate: false
 				}
 			});
 			return user;

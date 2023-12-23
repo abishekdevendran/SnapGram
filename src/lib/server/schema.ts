@@ -6,7 +6,8 @@ import {
 	varchar,
 	boolean,
 	primaryKey,
-	timestamp
+	timestamp,
+	index
 } from 'drizzle-orm/mysql-core';
 
 export const user = mysqlTable('user', {
@@ -21,7 +22,9 @@ export const user = mysqlTable('user', {
 		length: 255
 	}),
 	isPrivate: boolean('isPrivate').default(false)
-});
+}, (t) => ({
+	unameIdx : index('username_idx').on(t.username),
+}));
 
 export const post = mysqlTable('post', {
 	id: varchar('id', {
