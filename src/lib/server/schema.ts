@@ -123,11 +123,13 @@ export const userToPostRelations = relations(userToPost, ({ one }) => ({
 export const userToUserRelations = relations(userToUser, ({ one }) => ({
 	following: one(user, {
 		fields: [userToUser.user1Id],
-		references: [user.id]
+		references: [user.id],
+		relationName: 'following'
 	}),
 	follower: one(user, {
 		fields: [userToUser.user2Id],
-		references: [user.id]
+		references: [user.id],
+		relationName: 'followers'
 	})
 }));
 

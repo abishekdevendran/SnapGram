@@ -76,5 +76,3 @@ const seedFollowers = async () => {
 	await connection.end();
 	console.log(`Inserted ${userToUser.length} followers successfully 🎉`);
 };
-
-await seedPosts();
