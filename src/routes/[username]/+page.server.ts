@@ -41,7 +41,11 @@ export const load = async ({ params, locals }) => {
 						postId: false
 					},
 					with: {
-						post: true
+						post: {
+							with: {
+								comment: true
+							}
+						}
 					}
 				}
 			}
@@ -99,11 +103,13 @@ export const load = async ({ params, locals }) => {
 			}
 		});
 	}
-	console.log('Matches: ', matches);
 	//  get all pending follow requests
-	const pendingFollowRequests = await locals.db.query.followRequest.findMany({
-		where: (followRequest, { eq }) => eq(followRequest.followerId, session!.user.userId)
-	});
+	let pendingFollowRequests: InferSelectModel<typeof followRequest>[] = [];
+	if (session) {
+		pendingFollowRequests = await locals.db.query.followRequest.findMany({
+			where: (followRequest, { eq }) => eq(followRequest.followerId, session!.user.userId)
+		});
+	}
 	// if not self
 	let following: InferSelectModel<typeof user>[] = [];
 	if (session && session.user.username !== slug) {
