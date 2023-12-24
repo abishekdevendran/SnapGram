@@ -10,21 +10,25 @@ import {
 	index
 } from 'drizzle-orm/mysql-core';
 
-export const user = mysqlTable('user', {
-	id: varchar('id', {
-		length: 15 // change this when using custom user ids
-	}).primaryKey(),
-	// other user attributes
-	username: varchar('username', {
-		length: 255
-	}).unique(),
-	avatar: varchar('avatar', {
-		length: 255
-	}),
-	isPrivate: boolean('isPrivate').default(false)
-}, (t) => ({
-	unameIdx : index('username_idx').on(t.username),
-}));
+export const user = mysqlTable(
+	'user',
+	{
+		id: varchar('id', {
+			length: 15 // change this when using custom user ids
+		}).primaryKey(),
+		// other user attributes
+		username: varchar('username', {
+			length: 255
+		}).unique(),
+		avatar: varchar('avatar', {
+			length: 255
+		}),
+		isPrivate: boolean('isPrivate').default(false)
+	},
+	(t) => ({
+		unameIdx: index('username_idx').on(t.username)
+	})
+);
 
 export const post = mysqlTable('post', {
 	id: varchar('id', {
@@ -126,7 +130,7 @@ export const userRelations = relations(user, ({ many }) => ({
 	comment: many(comment),
 	followers: many(userToUser, { relationName: 'follower' }),
 	following: many(userToUser, { relationName: 'following' }),
-	followRequests: many(followRequest, { relationName: 'followRequests' })
+	followRequests: many(followRequest, { relationName: 'follower' })
 }));
 export const postRelations = relations(post, ({ many }) => ({
 	userToPost: many(userToPost),

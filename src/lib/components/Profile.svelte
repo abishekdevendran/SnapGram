@@ -2,10 +2,9 @@
 	import { enhance } from '$app/forms';
 	import Avatar from '$lib/components/Avatar.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { Loader2 } from 'lucide-svelte';
 	import toast from 'svelte-french-toast';
 	import type { User } from 'lucia';
-	import { GithubLogo } from 'radix-icons-svelte';
+	import { GithubLogo, Reload } from 'radix-icons-svelte';
 	let { user } = $props<{ user: User | undefined }>();
 	let isLoggingOut = $state(false);
 </script>
@@ -34,7 +33,7 @@
 			<Button type="submit" disabled={isLoggingOut} class="flex gap-2 text-black">
 				Sign out
 				{#if isLoggingOut}
-					<Loader2 class="animate-spin text-black" />
+					<Reload class="animate-spin" />
 				{/if}
 			</Button>
 		</form>

@@ -99,6 +99,7 @@ export const load = async ({ params, locals }) => {
 			}
 		});
 	}
+	console.log('Matches: ', matches);
 	//  get all pending follow requests
 	const pendingFollowRequests = await locals.db.query.followRequest.findMany({
 		where: (followRequest, { eq }) => eq(followRequest.followerId, session!.user.userId)
