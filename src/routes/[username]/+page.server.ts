@@ -173,7 +173,10 @@ export const load = async ({ params, locals }) => {
 export const actions = {
 	follow: async ({ locals, request }) => {
 		const session = await locals.auth.validate();
-		if (!session) return fail(401);
+		if (!session)
+			return fail(401, {
+				message: 'Sign in to follow users'
+			});
 		const formData = await request.formData();
 		const userId = formData.get('userId') as string | null;
 		if (!userId) return fail(400);
