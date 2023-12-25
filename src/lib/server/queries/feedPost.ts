@@ -182,7 +182,9 @@ export default async function fetchFeed({
 						}
 					}
 				}
-			}
+			},
+			limit: limit,
+			offset: page * limit
 		})
 		.prepare();
 	let posts = await preparedPosts.execute({
@@ -204,6 +206,6 @@ export default async function fetchFeed({
 		return post;
 	});
 	// cutoff posts that are not in the current page
-	posts = posts.slice(page * limit, page * limit + limit);
+	// console.log(posts);
 	return posts;
 }
