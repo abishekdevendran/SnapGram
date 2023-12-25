@@ -1,11 +1,10 @@
 import { auth } from '$lib/server/lucia.js';
-import { post, user, userToPost } from '$lib/server/schema.js';
+import { user } from '$lib/server/schema.js';
 import { fail, redirect } from '@sveltejs/kit';
-import { eq, type InferSelectModel } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { CLOUDINARY_API_SECRET } from '$env/static/private';
 import { v2 as cloudinary } from 'cloudinary';
 import { PUBLIC_CLOUDINARY_API_KEY } from '$env/static/public';
-import type { feedPost } from '$lib/index.d';
 import fetchFeed from '$lib/server/queries/feedPost.js';
 
 export const load = async ({ locals }) => {

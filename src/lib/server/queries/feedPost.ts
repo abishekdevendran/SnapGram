@@ -1,5 +1,6 @@
 import type { feedPost } from '$lib/index.d';
-import { sql } from 'drizzle-orm';
+import { userToPost, userToUser } from '$lib/server/schema';
+import { and, desc, sql } from 'drizzle-orm';
 import type { Session } from 'lucia';
 
 export default async function fetchFeed({
@@ -13,6 +14,65 @@ export default async function fetchFeed({
 	page?: number;
 	limit?: number;
 }) {
+	// if (session) {
+	// 	const preparedTempPosts = locals.db.query.post
+	// 		.findMany({
+	// 			orderBy: (post, { asc, desc }) => [desc(post.createdAt)],
+	// 			where: (post, { eq, exists, and }) =>
+	// 				exists(
+	// 					locals.db
+	// 						.select()
+	// 						.from(userToPost)
+	// 						.where(
+	// 							and(
+	// 								exists(
+	// 									locals.db
+	// 										.select()
+	// 										.from(userToUser)
+	// 										.where(
+	// 											and(
+	// 												eq(userToUser.user2Id, sql.placeholder('sessionUserId')),
+	// 												eq(userToUser.user1Id, userToPost.userId)
+	// 											)
+	// 										)
+	// 								),
+	// 								eq(userToPost.postId, post.id)
+	// 							)
+	// 						)
+	// 				),
+	// 			with: {
+	// 				comments: true,
+	// 				userToPost: {
+	// 					with: {
+	// 						user: {
+	// 							columns: {
+	// 								avatar: true,
+	// 								username: true
+	// 							}
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		})
+	// 		.prepare();
+	// 	let tempPosts = await preparedTempPosts.execute({
+	// 		sessionUserId: session.user.userId
+	// 	});
+	// 	tempPosts = tempPosts.map((post) => {
+	// 		// modify post to flatten the object
+	// 		// @ts-ignore
+	// 		post.authors = post.userToPost.map((userToPost) => {
+	// 			return {
+	// 				username: userToPost.user.username,
+	// 				avatar: userToPost.user.avatar
+	// 			};
+	// 		});
+	// 		// @ts-ignore
+	// 		delete post.userToPost;
+	// 		return post;
+	// 	});
+	// 	console.log(tempPosts[0]);
+	// }
 	if (!session) {
 		// get all public posts
 		const preparedPosts = locals.db.query.user
@@ -39,7 +99,7 @@ export default async function fetchFeed({
 									likes: true
 								},
 								with: {
-									comment: true,
+									comments: true,
 									userToPost: {
 										columns: {
 											userId: false,
@@ -85,53 +145,39 @@ export default async function fetchFeed({
 		return feed;
 	}
 	// get all posts whose atleast 1 tag is in the user's following list
-	const preparedPosts = locals.db.query.user
+	const preparedPosts = locals.db.query.post
 		.findMany({
-			where: (user, { eq }) => eq(user.id, sql.placeholder('sessionUserId')),
-			offset: page * limit,
-			limit,
+			orderBy: (post, { asc, desc }) => [desc(post.createdAt)],
+			where: (post, { eq, exists, and }) =>
+				exists(
+					locals.db
+						.select()
+						.from(userToPost)
+						.where(
+							and(
+								exists(
+									locals.db
+										.select()
+										.from(userToUser)
+										.where(
+											and(
+												eq(userToUser.user2Id, sql.placeholder('sessionUserId')),
+												eq(userToUser.user1Id, userToPost.userId)
+											)
+										)
+								),
+								eq(userToPost.postId, post.id)
+							)
+						)
+				),
 			with: {
-				following: {
-					columns: {
-						user1Id: false,
-						user2Id: false
-					},
+				comments: true,
+				userToPost: {
 					with: {
-						follower: {
+						user: {
 							columns: {
 								avatar: true,
-								id: false,
-								isPrivate: false,
 								username: true
-							},
-							with: {
-								userToPost: {
-									columns: {
-										userId: false,
-										postId: false
-									},
-									with: {
-										post: {
-											with: {
-												comment: true,
-												userToPost: {
-													columns: {
-														userId: false,
-														postId: false
-													},
-													with: {
-														user: {
-															columns: {
-																avatar: true,
-																username: true
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
 							}
 						}
 					}
@@ -139,35 +185,25 @@ export default async function fetchFeed({
 			}
 		})
 		.prepare();
-	const posts = await preparedPosts.execute({
+	let posts = await preparedPosts.execute({
 		sessionUserId: session.user.userId
 	});
 	// console.log(posts[0].following[0].follower.userToPost[0].post);
 	// consolidate all posts into a single array
-	let feed: feedPost[] = [];
-	posts.forEach((user) => {
-		user.following.forEach((following) => {
-			following.follower.userToPost.forEach((post) => {
-				// modify post to flatten the object
-				// @ts-ignore
-				post.post.authors = post.post.userToPost.map((userToPost) => {
-					return {
-						username: userToPost.user.username,
-						avatar: userToPost.user.avatar
-					};
-				});
-				// @ts-ignore
-				delete post.post.userToPost;
-				// @ts-ignore
-				feed.push(post.post);
-			});
+	posts = posts.map((post) => {
+		// modify post to flatten the object
+		// @ts-ignore
+		post.authors = post.userToPost.map((userToPost) => {
+			return {
+				username: userToPost.user.username,
+				avatar: userToPost.user.avatar
+			};
 		});
-	});
-	// sort by timestamp
-	feed.sort((a, b) => {
-		return (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0);
+		// @ts-ignore
+		delete post.userToPost;
+		return post;
 	});
 	// cutoff posts that are not in the current page
-	feed = feed.splice(page * limit, limit);
-	return feed;
+	posts = posts.slice(page * limit, page * limit + limit);
+	return posts;
 }

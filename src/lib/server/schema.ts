@@ -136,7 +136,7 @@ export const userRelations = relations(user, ({ many }) => ({
 }));
 export const postRelations = relations(post, ({ many }) => ({
 	userToPost: many(userToPost),
-	comment: many(comment)
+	comments: many(comment)
 }));
 export const commentRelations = relations(comment, ({ one }) => ({
 	user: one(user, {

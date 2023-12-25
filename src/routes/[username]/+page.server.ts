@@ -43,7 +43,7 @@ export const load = async ({ params, locals }) => {
 					with: {
 						post: {
 							with: {
-								comment: true
+								comments: true
 							}
 						}
 					}
@@ -95,7 +95,7 @@ export const load = async ({ params, locals }) => {
 					with: {
 						post: {
 							with: {
-								comment: true
+								comments: true
 							}
 						}
 					}
@@ -126,7 +126,7 @@ export const load = async ({ params, locals }) => {
 		});
 		following = resp.map((userToUser) => userToUser.follower);
 	} else {
-		following = matches[0].following;
+		following = matches[0]?.following ?? [];
 	}
 
 	if (!matches || matches.length === 0) {
@@ -151,7 +151,7 @@ export const load = async ({ params, locals }) => {
 		matches.following = matches.following.map((following: any) => following.follower);
 		matches.post = matches.userToPost.map((post: any) => {
 			// aggregate comments
-			post.post.comment = post.post.comment.map((comment: any) => comment);
+			post.post.comment = post.post.comments.map((comment: any) => comment);
 			return post.post;
 		});
 		matches.userToPost = undefined;
