@@ -3,4 +3,4 @@
 	let { data } = $props();
 </script>
 
-<Profile bind:data />
+<Profile {data} />

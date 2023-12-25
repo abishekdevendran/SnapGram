@@ -20,7 +20,6 @@
 	}>();
 	let pageFollowers = $state((data.user as { followers?: any[] }).followers ?? []);
 	let pageFollowing = $state((data.user as { following?: any[] }).following ?? []);
-	// $inspect(pageFollowers);
 	let pendingFollowRequests = $state(data.pendingFollowRequests);
 	let followingList = $state(data.following);
 	let followingDialogOpen = $state(false);
@@ -30,6 +29,14 @@
 	);
 	let amIFollowing = $derived(followingList.some((user) => user.id === data.user.id));
 	let isFollowing = $state(false);
+	$effect(() => {
+		if (data.user) {
+			pageFollowers = (data.user as { followers?: any[] }).followers ?? [];
+			pageFollowing = (data.user as { following?: any[] }).following ?? [];
+			pendingFollowRequests = data.pendingFollowRequests;
+			followingList = data.following;
+		}
+	});
 </script>
 
 {#if data.user}
@@ -41,10 +48,11 @@
 				{#if !data.isSelf}
 					<form
 						method="POST"
-						action="?/follow"
+						action={`/${data.user.username}?/follow`}
 						use:enhance={async () => {
 							isFollowing = true;
 							return async ({ result, update }) => {
+								console.log(result);
 								if (result.type === 'success') {
 									// remove from pendingFollowRequests
 									if(result.data?.message==='Follow request sent'){
@@ -74,7 +82,7 @@
 										});
 										toast.success('Followed');
 									} else if(result.data?.message==='Unfollowed'){
-										followingList = followingList.filter(
+										data.following = followingList.filter(
 											(user) => user.id !== data.user.id
 										);
 										// remove from pageFollowers
@@ -126,7 +134,6 @@
 														user={{
                       avatar: user.avatar,
                       username: user.username!,
-											isPrivate: user.isPrivate!,
                     }}
 													/>
 													<h4 class="text-sm">
@@ -165,7 +172,6 @@
 														user={{
                       avatar: user.avatar,
                       username: user.username!,
-											isPrivate: user.isPrivate!,
                     }}
 													/>
 													<h4 class="text-sm">
@@ -194,7 +200,6 @@
 					user={{
 				avatar: data.user.avatar,
 				username: data.user.username!,
-				isPrivate: data.user.isPrivate!,
 			}}
 				/>
 			{:else}

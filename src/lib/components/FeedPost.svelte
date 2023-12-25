@@ -2,6 +2,7 @@
 	import PublicAvatar from '$lib/components/PublicAvatar.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import type { feedPost } from '$lib/index.d';
+	import { CldImage } from 'svelte-cloudinary';
 
 	let { data } = $props<{
 		data: feedPost;
@@ -16,7 +17,7 @@
 				<PublicAvatar
 					user={{
         avatar: data.authors[0].avatar!,
-        username: data.authors[0].username!,
+        username: data.authors[0].username!
       }}
 					className="h-8 w-8"
 				/>
@@ -31,7 +32,7 @@
 		<span class="text-xs text-gray-500">{data.createdAt?.toLocaleDateString('en-US')}</span>
 	</div>
 	<div class="mt-2">
-		<img class="w-full" src={data.image} alt={data.createdAt?.toLocaleDateString('en-US')} />
+		<img width="w-full" src={data.image} alt={data.createdAt?.toLocaleDateString('en-US')} />
 	</div>
 	<div class="mt-2 flex flex-row items-center justify-between">
 		<div class="flex flex-row items-center">
