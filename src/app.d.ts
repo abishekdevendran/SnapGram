@@ -22,6 +22,7 @@ declare global {
 			username: string;
 			avatar: string | null;
 			isPrivate: boolean;
+			bio: string;
 		};
 		type DatabaseSessionAttributes = {};
 	}

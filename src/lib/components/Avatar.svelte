@@ -7,7 +7,7 @@
 	import type { User } from 'lucia';
 	import { cn } from '$lib/utils/ui';
 	let { user, className } = $props<{
-		user: User;
+		user: Omit<User, 'bio'>;
 		className: string | undefined;
 	}>();
 	let widget = $state<any>(null);

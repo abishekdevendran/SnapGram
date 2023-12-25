@@ -3,4 +3,6 @@
 	let { data } = $props();
 </script>
 
-<Profile {data} />
+<main class="flex w-full flex-col items-center pt-6">
+	<Profile {data} />
+</main>

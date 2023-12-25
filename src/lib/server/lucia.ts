@@ -20,7 +20,8 @@ export const auth = lucia({
 		return {
 			username: data.username,
 			avatar: data.avatar,
-			isPrivate: data.isPrivate
+			isPrivate: data.isPrivate,
+			bio: data.bio
 		};
 	}
 });

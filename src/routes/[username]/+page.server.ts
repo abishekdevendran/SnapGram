@@ -1,5 +1,5 @@
 import { followRequest, post, user, userToPost, userToUser } from '$lib/server/schema.js';
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { and, eq, type InferSelectModel } from 'drizzle-orm';
 
 export const load = async ({ params, locals }) => {
@@ -251,5 +251,34 @@ export const actions = {
 			console.log(e);
 			return fail(400);
 		}
+	},
+	updateProfile: async ({ locals, request }) => {
+		const session = await locals.auth.validate();
+		if (!session)
+			return fail(401, {
+				message: 'Sign in to update profile'
+			});
+		const formData = await request.formData();
+		const formDataObj = Object.fromEntries(formData.entries());
+		const { username, bio, isPrivate } = formDataObj as unknown as {
+			username: string | undefined;
+			bio: string | undefined;
+			isPrivate: boolean | undefined;
+		};
+		console.log(username, bio, isPrivate);
+		try {
+			await locals.db
+				.update(user)
+				.set({
+					...(username && { username }),
+					...(bio && { bio }),
+					isPrivate: isPrivate ? true : false
+				})
+				.where(eq(user.id, session.user.userId));
+		} catch (e) {
+			console.log(e);
+			return fail(400);
+		}
+		redirect(302, `/${username}`);
 	}
 };

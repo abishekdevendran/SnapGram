@@ -7,7 +7,8 @@ import {
 	boolean,
 	primaryKey,
 	timestamp,
-	index
+	index,
+	text
 } from 'drizzle-orm/mysql-core';
 
 export const user = mysqlTable(
@@ -23,7 +24,8 @@ export const user = mysqlTable(
 		avatar: varchar('avatar', {
 			length: 255
 		}),
-		isPrivate: boolean('isPrivate').default(false)
+		isPrivate: boolean('isPrivate').default(false),
+		bio: text('bio').default(`I am using SnapGram!`)
 	},
 	(t) => ({
 		unameIdx: index('username_idx').on(t.username)

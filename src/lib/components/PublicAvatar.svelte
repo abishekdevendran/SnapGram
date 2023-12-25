@@ -3,7 +3,7 @@
 	import { cn } from '$lib/utils/ui';
 	import type { User } from 'lucia';
 	let { user, className } = $props<{
-		user: Omit<Omit<User, 'userId'>,'isPrivate'>;
+		user: Omit<User, 'userId' | 'isPrivate' | 'bio'>;
 		className: string | undefined;
 	}>();
 </script>
