@@ -15,6 +15,7 @@ declare global {
 		interface Locals {
 			auth: import('lucia').AuthRequest;
 			db: MySql2Database<typeof schema>;
+			redis: import('ioredis').Redis;
 		}
 		// interface PageData {}
 		// interface PageState {}

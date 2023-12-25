@@ -29,10 +29,16 @@
 				, <Button variant="link" href={`/${author.username}`}>{author.username}</Button>
 			{/each}
 		</div>
-		<span class="text-xs text-gray-500">{data.createdAt?.toLocaleDateString('en-US')}</span>
+		<span class="text-xs text-gray-500"
+			>{new Date(data.createdAt ?? '').toLocaleDateString('en-US')}</span
+		>
 	</div>
 	<div class="mt-2">
-		<img width="w-full" src={data.image} alt={data.createdAt?.toLocaleDateString('en-US')} />
+		<img
+			width="w-full"
+			src={data.image}
+			alt={new Date(data.createdAt ?? '').toLocaleDateString('en-US')}
+		/>
 	</div>
 	<div class="mt-2 flex flex-row items-center justify-between">
 		<div class="flex flex-row items-center">
