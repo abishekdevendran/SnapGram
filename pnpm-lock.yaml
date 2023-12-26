@@ -11,6 +11,12 @@ dependencies:
   '@lucia-auth/oauth':
     specifier: ^3.5.0
     version: 3.5.0(lucia@2.7.6)
+  '@tanstack/svelte-query':
+    specifier: ^5.15.0
+    version: 5.15.0(svelte@5.0.0-next.26)
+  '@tanstack/svelte-virtual':
+    specifier: ^3.0.1
+    version: 3.0.1(svelte@5.0.0-next.26)
   '@uppy/aws-s3':
     specifier: ^3.6.0
     version: 3.6.0(@uppy/core@3.8.0)
@@ -3024,6 +3030,32 @@ packages:
     resolution: {integrity: sha512-FaruWX6KdudYloq1AHD/4nU+UsMTdNE8CKyrseXWEcgjDAbvkwJg2QGPAnfIJLIWsjZOSPLOAykK6fuYp4vp4A==}
     dependencies:
       tslib: 2.6.2
+    dev: false
+
+  /@tanstack/query-core@5.14.2:
+    resolution: {integrity: sha512-QmoJvC72sSWs3hgGis8JdmlDvqLfYGWUK4UG6OR9Q6t28JMN9m2FDwKPqoSJ9YVocELCSjMt/FGjEiLfk8000Q==}
+    dev: false
+
+  /@tanstack/svelte-query@5.15.0(svelte@5.0.0-next.26):
+    resolution: {integrity: sha512-HlDg8uN9heF8ZJH6oJtZlBQjV++jdvyS3Rd4B+bp86RVxgrAjrr4LmKNqBhfOjNWHGmLTNEmzpdvg8QtzGZKhg==}
+    peerDependencies:
+      svelte: ^3.54.0 || ^4.0.0 || ^5.0.0-next.0
+    dependencies:
+      '@tanstack/query-core': 5.14.2
+      svelte: 5.0.0-next.26
+    dev: false
+
+  /@tanstack/svelte-virtual@3.0.1(svelte@5.0.0-next.26):
+    resolution: {integrity: sha512-zGi0Dl5yr9FzDFAEosF3V1/KqbhKPsZsQ7DFAy7qLepOAkxh/whlH2f4kvWl1Vi1a3nx4mjDFBJOJvmOwmdOFA==}
+    peerDependencies:
+      svelte: ^3.48.0 || ^4.0.0
+    dependencies:
+      '@tanstack/virtual-core': 3.0.0
+      svelte: 5.0.0-next.26
+    dev: false
+
+  /@tanstack/virtual-core@3.0.0:
+    resolution: {integrity: sha512-SYXOBTjJb05rXa2vl55TTwO40A6wKu0R5i1qQwhJYNDIqaIGF7D0HsLw+pJAyi2OvntlEIVusx3xtbbgSUi6zg==}
     dev: false
 
   /@transloadit/prettier-bytes@0.0.7:

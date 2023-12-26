@@ -5,7 +5,7 @@
 	import toast from 'svelte-french-toast';
 	import type { User } from 'lucia';
 	import { GithubLogo, Reload } from 'radix-icons-svelte';
-	let { user } = $props<{ user: User | undefined }>();
+	let { user } = $props<{ user: User | null }>();
 	let isLoggingOut = $state(false);
 </script>
 

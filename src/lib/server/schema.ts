@@ -1,5 +1,5 @@
 // schema.ts
-import { relations, sql } from 'drizzle-orm';
+import { relations, sql, type InferSelectModel } from 'drizzle-orm';
 import {
 	mysqlTable,
 	bigint,
@@ -20,11 +20,11 @@ export const user = mysqlTable(
 		// other user attributes
 		username: varchar('username', {
 			length: 255
-		}).unique(),
+		}).unique().notNull(),
 		avatar: varchar('avatar', {
 			length: 255
 		}),
-		isPrivate: boolean('isPrivate').default(false),
+		isPrivate: boolean('isPrivate').default(false).notNull(),
 		bio: text('bio').default(`I am using SnapGram!`)
 	},
 	(t) => ({
@@ -41,8 +41,8 @@ export const post = mysqlTable('post', {
 	}).notNull(),
 	likes: bigint('likes', {
 		mode: 'number'
-	}).default(0),
-	createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`)
+	}).default(0).notNull(),
+	createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`).notNull()
 });
 
 export const comment = mysqlTable('comment', {
@@ -214,3 +214,11 @@ export const session = mysqlTable('session', {
 		mode: 'number'
 	}).notNull()
 });
+
+// types 
+export type TUser = InferSelectModel<typeof user>;
+export type TPost = InferSelectModel<typeof post>;
+export type TComment = InferSelectModel<typeof comment>;
+export type TUserToPost = InferSelectModel<typeof userToPost>;
+export type TUserToUser = InferSelectModel<typeof userToUser>;
+export type TFollowRequest = InferSelectModel<typeof followRequest>;

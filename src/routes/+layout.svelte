@@ -6,12 +6,15 @@
 	import { ProgressBar } from '@prgm/sveltekit-progress-bar';
 	import { pwaInfo } from 'virtual:pwa-info';
 	import { onMount } from 'svelte';
+	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+	import { browser } from '$app/environment';
+	let { data } = $props();
 	onMount(async () => {
 		if (pwaInfo) {
 			const { registerSW } = await import('virtual:pwa-register');
 			registerSW({
 				immediate: true,
-				onRegistered(r:any) {
+				onRegistered(r: any) {
 					// uncomment following code if you want check for updates
 					// r && setInterval(() => {
 					//    console.log('Checking for sw update')
@@ -25,16 +28,23 @@
 			});
 		}
 	});
-	$: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : '';
+	let webManifestLink = $state('');
+	$effect(() => {
+		if (pwaInfo) {
+			webManifestLink = pwaInfo.webManifest.linkTag;
+		}
+	});
 </script>
 
 <svelte:head>
 	{@html webManifestLink}
 </svelte:head>
-<Toaster />
-<ProgressBar class="text-primary" />
-<nav class="sticky top-0 flex h-[100svh] w-16 items-center justify-center">
-	<Lightswitch />
-</nav>
-<slot />
-<ModeWatcher></ModeWatcher>
+<QueryClientProvider client={data.queryClient}>
+	<Toaster />
+	<ProgressBar class="text-primary" />
+	<nav class="sticky top-0 flex h-[100svh] w-16 items-center justify-center">
+		<Lightswitch />
+	</nav>
+	<slot />
+	<ModeWatcher />
+</QueryClientProvider>

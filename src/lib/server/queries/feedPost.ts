@@ -1,4 +1,4 @@
-import type { feedPost } from '$lib/index.d';
+import type { feedPost } from '$lib/types';
 import { user, userToPost, userToUser } from '$lib/server/schema';
 import { and, desc, sql } from 'drizzle-orm';
 import type { Session } from 'lucia';
@@ -15,7 +15,7 @@ export default async function fetchFeed({
 	session: Session | null;
 	page?: number;
 	limit?: number;
-}) {
+}): Promise<feedPost[]> {
 	// check if for the same session user, page and limit, the feed has already been cached
 	const key = `feed:${session?.user.userId}:${page}:${limit}`;
 	const cachedFeed = await locals.redis.get(key);
@@ -62,19 +62,20 @@ export default async function fetchFeed({
 				offset: page * limit
 			})
 			.prepare();
-		let posts = await preparedPosts.execute();
-		posts = posts.map((post) => {
-			// modify post to flatten the object
-			// @ts-ignore
-			post.authors = post.userToPost.map((userToPost) => {
-				return {
-					username: userToPost.user.username,
-					avatar: userToPost.user.avatar
+		let posts = await preparedPosts.execute().then((posts) => {
+			const temp = posts.map((post) => {
+				const modifiedPost = {
+					...post,
+					authors: post.userToPost.map((userToPost) => ({
+						username: userToPost.user.username,
+						avatar: userToPost.user.avatar
+					}))
 				};
+				// Use destructuring to omit the property
+				const { userToPost, ...result } = modifiedPost;
+				return modifiedPost as feedPost; // Assert the type here
 			});
-			// @ts-ignore
-			delete post.userToPost;
-			return post;
+			return temp;
 		});
 		// cache the feed for given time
 		await locals.redis.set(key, JSON.stringify(posts), 'EX', cacheDuration);
@@ -110,6 +111,10 @@ export default async function fetchFeed({
 			with: {
 				comments: true,
 				userToPost: {
+					columns: {
+						postId: false,
+						userId: false
+					},
 					with: {
 						user: {
 							columns: {
@@ -124,24 +129,25 @@ export default async function fetchFeed({
 			offset: page * limit
 		})
 		.prepare();
-	let posts = await preparedPosts.execute({
-		sessionUserId: session.user.userId
-	});
-	// console.log(posts[0].following[0].follower.userToPost[0].post);
-	// consolidate all posts into a single array
-	posts = posts.map((post) => {
-		// modify post to flatten the object
-		// @ts-ignore
-		post.authors = post.userToPost.map((userToPost) => {
-			return {
-				username: userToPost.user.username,
-				avatar: userToPost.user.avatar
-			};
+	let posts: feedPost[] = await preparedPosts
+		.execute({
+			sessionUserId: session.user.userId
+		})
+		.then((posts) => {
+			const temp = posts.map((post) => {
+				const modifiedPost = {
+					...post,
+					authors: post.userToPost.map((userToPost) => ({
+						username: userToPost.user.username,
+						avatar: userToPost.user.avatar
+					}))
+				};
+				// Use destructuring to omit the property
+				const { userToPost, ...result } = modifiedPost;
+				return modifiedPost as feedPost; // Assert the type here
+			});
+			return temp;
 		});
-		// @ts-ignore
-		delete post.userToPost;
-		return post;
-	});
 	// cache the feed for given time
 	await locals.redis.set(key, JSON.stringify(posts), 'EX', cacheDuration);
 	// cutoff posts that are not in the current page

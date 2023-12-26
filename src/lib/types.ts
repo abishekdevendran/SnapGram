@@ -3,7 +3,7 @@ export type feedPost = {
 	image: string;
 	likes: number | null;
 	createdAt: Date | null;
-	comment: {
+	comments: {
 		id: string;
 		userId: string;
 		postId: string;

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PublicAvatar from '$lib/components/PublicAvatar.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import type { feedPost } from '$lib/index.d';
+	import type { feedPost } from '$lib/types';
 	import { CldImage } from 'svelte-cloudinary';
 
 	let { data } = $props<{

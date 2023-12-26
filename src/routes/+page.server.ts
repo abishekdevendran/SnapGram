@@ -7,13 +7,18 @@ import { v2 as cloudinary } from 'cloudinary';
 import { PUBLIC_CLOUDINARY_API_KEY } from '$env/static/public';
 import fetchFeed from '$lib/server/queries/feedPost.js';
 
-export const load = async ({ locals }) => {
+export const load = async ({ locals, parent }) => {
 	// await auth hook
 	const session = await locals.auth.validate();
 	// console.log(feed[0]);
+	const { queryClient } = await parent();
+	// TODO: offload fetchFeed to a separate API endpoint and cache responses, forward set-Headers to client
+	await queryClient.prefetchQuery({
+		queryKey: ['feed', session?.user?.userId || ''],
+		queryFn: async () => (await fetchFeed({ locals, session }))
+	});
 	return {
-		user: session ? session.user : null,
-		feed: await fetchFeed({ locals, session })
+		user: session ? session.user : null
 	};
 	// generate a signed upload URL if user is authenticated
 };

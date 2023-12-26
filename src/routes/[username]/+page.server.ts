@@ -1,4 +1,4 @@
-import { followRequest, post, user, userToPost, userToUser } from '$lib/server/schema.js';
+import { followRequest, post, user, userToPost, userToUser, type TUser, type TPost } from '$lib/server/schema.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { and, eq, type InferSelectModel } from 'drizzle-orm';
 
@@ -111,7 +111,7 @@ export const load = async ({ params, locals }) => {
 		});
 	}
 	// if not self
-	let following: InferSelectModel<typeof user>[] = [];
+	let following: TUser[] = [];
 	if (session && session.user.username !== slug) {
 		// get all following list
 		const resp = await locals.db.query.userToUser.findMany({
@@ -155,10 +155,10 @@ export const load = async ({ params, locals }) => {
 			return post.post;
 		});
 		matches.userToPost = undefined;
-		const ans: InferSelectModel<typeof user> & {
-			followers: InferSelectModel<typeof user>[];
-			following: InferSelectModel<typeof user>[];
-			post: InferSelectModel<typeof post>[];
+		const ans: TUser & {
+			followers: TUser[];
+			following: TUser[];
+			post: TPost[];
 		} = matches;
 		return {
 			user: ans,
